@@ -58,3 +58,8 @@ int main(int argc, char *argv[]){
     }
     else
         printf("Successful bind...\n);
+               
+    /*listening*/
+    if() {
+    }
+               
