@@ -52,7 +52,9 @@ int main(int argc, char *argv[]){
 }
 
     /*binding*/
-    if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
+    if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr))) != 0) {
         perror("Bind");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
+    else
+        printf("Successful bind...\n);
