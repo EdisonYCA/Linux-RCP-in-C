@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
         printf("Successful bind...\n);
                
     /*listening*/
-    if(listen() < 0) {
+    if(listen(sd, 128) < 0) {
         perror("Listening failed");
         exit(EXIT_FAILURE);
     }
