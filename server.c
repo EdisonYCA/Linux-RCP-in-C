@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
 }
 
     /*binding*/
-    if ((bind(sd, (struct sockaddr *)&server_addr, sizeof(server_adder)) < 0) {
+    if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
         perror("Bind");
         exit(1);
     }
