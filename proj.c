@@ -7,3 +7,37 @@ that can be shared between the client and the server.
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
+
+extern int errno;
+
+int receive_msg();
+int send_mesg();
+void send_data();
+void recv_data();
+
+#define MAX_DATA_SIZE 1024
+#define STAT_OK 1
+#define STAT_FAIL -1
+#define CMD_SEND 1
+#define CMD_RECV 2
+#define CMD_RESP 3
+#define CMD_DATA 4
+
+struct send_msg {
+    int msg_type;
+    int file_size;
+    char filename[128];
+};
+
+struct resp_msg {
+    int msg_type;
+    int status;
+    int filesize;
+};
+
+struct data_msg {
+    int msg_type;
+    int data_leng;
+    char buffer[1024];
+};
