@@ -52,4 +52,7 @@ int main(int argc, char *argv[]){
 }
 
     /*binding*/
-    if (bind(sd, 
+    if ((bind(sd, ) != 0) {
+        perror("Bind");
+        exit(1);
+    }
