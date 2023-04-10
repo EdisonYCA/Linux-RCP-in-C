@@ -49,8 +49,13 @@ int main(int argc, char *argv[]){
     saddr.sin_family = AF_INET;
     saddr.sin_addr.s_addr = htonl(addr);
     saddr.sin_port = htons(port);
-}
 
+    /*socket*/
+    if((sd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("Socket failed");
+        exit(EXIT_FAILURE);
+    }
+    
     /*binding*/
     if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr))) < 0) {
         perror("Bind failed");
@@ -66,4 +71,7 @@ int main(int argc, char *argv[]){
     }
     else
         printf("Server's listening...\n");
+    
                
+               
+}
