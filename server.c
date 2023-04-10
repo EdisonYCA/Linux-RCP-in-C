@@ -50,3 +50,6 @@ int main(int argc, char *argv[]){
     saddr.sin_addr.s_addr = htonl(addr);
     saddr.sin_port = htons(port);
 }
+
+    /*binding*/
+    if (bind(sd, 
