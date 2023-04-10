@@ -52,14 +52,18 @@ int main(int argc, char *argv[]){
 }
 
     /*binding*/
-    if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr))) != 0) {
-        perror("Bind");
+    if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr))) < 0) {
+        perror("Bind failed");
         exit(EXIT_FAILURE);
     }
     else
         printf("Successful bind...\n);
                
     /*listening*/
-    if() {
+    if(listen() < 0) {
+        perror("Listening failed");
+        exit(EXIT_FAILURE);
     }
+    else
+        printf("Server's listening...\n");
                
