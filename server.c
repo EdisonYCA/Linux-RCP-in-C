@@ -47,6 +47,6 @@ int main(int argc, char *argv[]){
     /* define sockaddr_in */
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
-    saddr.sin_addr.s_addr = addr;
+    saddr.sin_addr.s_addr = htonl(addr);
     saddr.sin_port = htons(port);
 }
