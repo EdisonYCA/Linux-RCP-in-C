@@ -1,12 +1,12 @@
-#include "proj.c"
+#include "proj.h"
 
 int main(int argc, char *argv[]){
     /* define TCP socket */
     int sd; // socket descriptor
-    FILE *file;
-    struct send_msg sendMessage;
+    // FILE *file;
+    // struct send_msg sendMessage;
     
-    int rem_sd, receive, send, size;
+    // int rem_sd, receive, send, size;
     
     if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){ // ensure sucess
         perror("Error creating server socket: ");
@@ -15,9 +15,7 @@ int main(int argc, char *argv[]){
 
     /* store address and port */
     int addr, port; // user defined address and port
-    unsigned char buf[sizeof(struct in_addr)];
      
-
     if(argc != 3){ // user has not passed address and port through cmd
         /* read address and port */
         char iaddr[30]; // address from input
@@ -29,12 +27,12 @@ int main(int argc, char *argv[]){
         printf("Enter port: ");
         scanf("%9s", iport);
 
-        addr = inet_pton(AF_INET, iaddr, buf);
+        addr = inet_addr(iaddr);
         port = atoi(iport);
     }
     else { // user has passed address and port through cmd 
         /* convert inet address and port to the convert data types */
-        addr = inet_pton(AF_INET, argv[1], buf);
+        addr = inet_addr(argv[1]);
         port = atoi(argv[2]);
     }
 
@@ -52,33 +50,35 @@ int main(int argc, char *argv[]){
     /* define sockaddr_in */
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
-    saddr.sin_addr.s_addr = htonl(addr);
+    saddr.sin_addr.s_addr = addr;
     saddr.sin_port = htons(port);
     
-    /*binding*/
-    if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr))) < 0) {
-        perror("Bind failed");
+    /* bind socket */
+    if ((bind(sd, (SA*)&saddr, sizeof(saddr))) < 0) {
+        perror("Bind failed: ");
         exit(EXIT_FAILURE);
     }
-    else
-        printf("Successful bind...\n);
+
                
-    /*listening*/
-    if ((listen(sd, 128)) < 0) {
-        perror("Listening failed");
+    /* listening for a client */
+    if ((listen(sd, 128)) < 0) { // marks socket as passive
+        perror("Listening failed: ");
         exit(EXIT_FAILURE);
     }
-    else
-        printf("Server's listening...\n");
+    printf("Server: listening\n");
     
+    /* use accepts in a infinite loop to accept incoming connections */
+    struct sockaddr_in client; // client to connect
+
     while(1) {
-        printf("Server: Connected to %s, port %d\n", addr, port);
-        receive = receive_msg(rem_sd, &sendMessage, sizeof(sendMessage);
-        printf("sd = %d, rem_sd = %d\n", sd, rem_sd);
-        printf("receive_msg sd = %d\n", receive);
-        printf("Server: Received message type %d from %s, port %d\n", sendMessage.msg_type, addr, port);
-        
-        
+        int len = sizeof(client); // len of client struct
+        int cli_sd; // client socket description
+        if ((cli_sd = accept(sd, (SA*)&client, &len)) < 0) { // marks socket as passive
+            perror("Accepting client failed: ");
+            exit(EXIT_FAILURE);
+        }
+        printf("Connection accepted\n");
     }
-               
+
+    close(sd);              
 }
