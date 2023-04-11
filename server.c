@@ -1,9 +1,13 @@
 #include "proj.c"
 
-extern int errno; 
 int main(int argc, char *argv[]){
     /* define TCP socket */
     int sd; // socket descriptor
+    FILE *file;
+    struct send_msg sendMessage;
+    
+    int rem_sd, receive, send, size;
+    
     if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){ // ensure sucess
         perror("Error creating server socket: ");
         exit(EXIT_FAILURE);
@@ -12,6 +16,7 @@ int main(int argc, char *argv[]){
     /* store address and port */
     int addr, port; // user defined address and port
     unsigned char buf[sizeof(struct in_addr)];
+     
 
     if(argc != 3){ // user has not passed address and port through cmd
         /* read address and port */
@@ -49,12 +54,6 @@ int main(int argc, char *argv[]){
     saddr.sin_family = AF_INET;
     saddr.sin_addr.s_addr = htonl(addr);
     saddr.sin_port = htons(port);
-
-    /*socket*/
-    if((sd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("Socket failed");
-        exit(EXIT_FAILURE);
-    }
     
     /*binding*/
     if ((bind(sd, (struct sockaddr *)&saddr, sizeof(saddr))) < 0) {
@@ -72,6 +71,14 @@ int main(int argc, char *argv[]){
     else
         printf("Server's listening...\n");
     
-               
+    while(1) {
+        printf("Server: Connected to %s, port %d\n", addr, port);
+        receive = receive_msg(rem_sd, &sendMessage, sizeof(sendMessage);
+        printf("sd = %d, rem_sd = %d\n", sd, rem_sd);
+        printf("receive_msg sd = %d\n", receive);
+        printf("Server: Received message type %d from %s, port %d\n", sendMessage.msg_type, addr, port);
+        
+        
+    }
                
 }
