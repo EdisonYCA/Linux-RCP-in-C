@@ -47,6 +47,5 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
     
-    printf("Connected to server\n");
     printf("Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
 }
