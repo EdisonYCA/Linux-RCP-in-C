@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
             perror("Accepting client failed: ");
             exit(EXIT_FAILURE);
         }
-        printf("Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+        printf("Server: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
     }
 
     close(sd);              
