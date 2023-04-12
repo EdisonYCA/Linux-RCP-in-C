@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
     /* store address and port */
     int addr, port; // user defined address and port
     char *ttp; // user defined transfer type
-    char* file_name; // user defined file name
+    FILE* file_name; // user defined file name
 
     if(argc != 5){ // user has not passed address and port through cmd
         /* read address and port */
@@ -31,12 +31,12 @@ int main(int argc, char *argv[]){
         scanf("%4s", tt);
 
         printf("Enter the name of the file: ");
-        scanf("%29s", file);
+        scanf("%29s", argv[4]);
 
         addr = inet_addr(iaddr);
         port = atoi(iport);
         ttp = tt;
-        file_name = file;
+        //file_name = file;
     }
 
     else { // user has passed address and port through cmd 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
         addr = inet_addr(argv[1]);
         port = atoi(argv[2]);
         ttp = argv[3];
-        file_name = argv[4];
+        //file_name = argv[4];
     }
 
     /* define sockaddr_in */
@@ -63,14 +63,21 @@ int main(int argc, char *argv[]){
     }
     
     printf("Client: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-    printf("Client file name: %s\n", file_name);
-
+    printf("Client file name: %s\n", argv[4]);
+    
     /* send transfer type to transfer */
-    // if(ttp == "-s"){
+    if(strcmp(ttp, "-s") == 0){
+        file_name = fopen(argv[4], "r");
+        if(file_name == NULL) {
+	        perror("fopen");
+	        exit(EXIT_FAILURE);
+        }
+        
+        fseek(file_name, 0, SEEK_END);
         struct send_msg msg; // message to send
         msg.msg_type = CMD_SEND;
-        sprintf(msg.filename, "%s", file_name);
         msg.file_size = 0;
+	    msg.file_size = ftell(file_name);
         
         int snd; // return value from send(2)
         if((snd = send(sd, &msg, sizeof(struct send_msg), 0)) < 0){ // send message and ensure success
@@ -78,9 +85,10 @@ int main(int argc, char *argv[]){
             close(sd);
             exit(EXIT_FAILURE);
         }
+        
         printf("Client sends command to server: type %d, filesize %d, filename %s\n", msg.msg_type,
-        msg.file_size, msg.filename);
-    // }
+        msg.file_size, argv[4]);
+    }
     
     close(sd);
 }
