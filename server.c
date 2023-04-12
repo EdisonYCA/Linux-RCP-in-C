@@ -78,7 +78,7 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
         }
         printf("Server: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-        printf("sd = %d, rm sd = %d\n", sd, cli_sd); // socket descriptors
+        printf("sd = %d, rem_sd = %d\n", sd, cli_sd); // socket descriptors
 
         /* receive the transfer type from client */
         int rcv; // recv return value
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]){
             close(sd);
             exit(EXIT_FAILURE);
         }
-        printf("Server: Recived message type %d from %s, port %d\n", rec_msg.msg_type, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+        printf("Server: Received message type %d from %s, port %d\n", rec_msg.msg_type, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
     }
 
     close(sd);              
