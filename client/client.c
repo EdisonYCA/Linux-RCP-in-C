@@ -48,4 +48,6 @@ int main(int argc, char *argv[]){
     }
     
     printf("Client: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+    
+    close(sd);
 }
