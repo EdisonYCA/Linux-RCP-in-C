@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
     // int rem_sd, receive, send, size;
     
     if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){ // ensure sucess
-        perror("Error creating server socket: ");
+        perror("Error creating server socket");
         exit(EXIT_FAILURE);
     }
 
@@ -38,12 +38,12 @@ int main(int argc, char *argv[]){
 
     /* ensure success in reading addr and port */
     if(addr == -1){
-        perror("Error converting Inet address: ");
+        perror("Error converting Inet address");
         exit(EXIT_FAILURE);
     }
 
     if(port == 0){
-        perror("Error converting port to integer: ");
+        perror("Error converting port to integer");
         exit(EXIT_FAILURE);
     }
 
@@ -55,14 +55,14 @@ int main(int argc, char *argv[]){
     
     /* bind socket */
     if ((bind(sd, (SA*)&saddr, sizeof(saddr))) < 0) {
-        perror("Bind failed: ");
+        perror("Bind failed");
         exit(EXIT_FAILURE);
     }
 
                
     /* listening for a client */
     if ((listen(sd, 128)) < 0) { // marks socket as passive
-        perror("Listening failed: ");
+        perror("Listening failed");
         exit(EXIT_FAILURE);
     }
     printf("Server: listening\n");
@@ -78,6 +78,17 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
         }
         printf("Server: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+        printf("sd = %d, rm sd = %d\n", sd, cli_sd); // socket descriptors
+
+        /* receive the transfer type from client */
+        int rcv; // recv return value
+        struct send_msg rec_msg; // message received 
+        if((rcv = recv(cli_sd, &rec_msg, sizeof(struct send_msg), 0)) < 0){ // ensure success with recv function
+            perror("Error receiving message");
+            close(sd);
+            exit(EXIT_FAILURE);
+        }
+        printf("Server: Recived message type %d from %s, port %d\n", rec_msg.msg_type, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
     }
 
     close(sd);              
