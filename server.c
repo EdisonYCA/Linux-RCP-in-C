@@ -79,10 +79,13 @@ int main(int argc, char *argv[]){
         }
         printf("Server: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
         printf("sd = %d, rem_sd = %d\n", sd, cli_sd); // socket descriptors
-
+        printf("receive_msg sd = %d", cli_sd);
         /* receive the transfer type from client */
         int rcv; // recv return value
         struct send_msg rec_msg; // message received 
+        rec_msg.msg_type = CMD_RECV;
+        rec_msg.file_size = 0;
+	    //rec_msg.file_size = ftell();
         if((rcv = recv(cli_sd, &rec_msg, sizeof(struct send_msg), 0)) < 0){ // ensure success with recv function
             perror("Error receiving message");
             close(sd);
