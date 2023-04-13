@@ -92,6 +92,13 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
         }
         printf("Server: Received message type %d from %s, port %d\n", rec_msg.msg_type, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+
+        /* sending message to client*/
+
+
+        /*file writing*/
+
+
     }
 
     close(sd);              

@@ -89,7 +89,9 @@ int main(int argc, char *argv[]){
         printf("Client sends command to server: type %d, filesize %d, filename %s\n", msg.msg_type,
         msg.file_size, argv[4]);
         printf("send_msg sd = %d, leng = #\n", sd);
-        printf("receive_msg sd = %d", sd);
+
+        /*receiving message from client*/
+        printf("receive_msg sd = %d\n", sd);
 
         printf("Client response received, type =, status =, filesize =\n");
     }
