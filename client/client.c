@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
     int con; // return of connect func
     
     if((con = connect(sd, (SA*)&saddr, sizeof(saddr))) < 0){
-        perror("Connection denied: ");
+        perror("Connection denied");
         close(sd);
         exit(EXIT_FAILURE);
     }
