@@ -3,7 +3,9 @@
 int main(int argc, char *argv[]){
     /* define TCP socket */
     int sd; // socket descriptor
-    
+    int sock_sd;
+     
+    //sock_sd = socket(AF_INET, SOCK_STREAM, 0);
     if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){ // ensure sucess
         perror("Error creating server socket: ");
         exit(EXIT_FAILURE);
@@ -77,7 +79,7 @@ int main(int argc, char *argv[]){
         struct send_msg msg; // message to send
         msg.msg_type = CMD_SEND;
         sprintf(msg.filename, "%s", file_name);
-	    msg.file_size = lseek(fd, 0, SEEK_END);
+	msg.file_size = lseek(fd, 0, SEEK_END);
         
         int snd; // bytes sent
         if((snd = send(sd, &msg, sizeof(struct send_msg), 0)) < 0){ // send message and ensure success
@@ -93,14 +95,18 @@ int main(int argc, char *argv[]){
         /* receiving message from server */
         printf("receive_msg sd = %d\n", sd);
         int rcv; // recv return value
-        struct resp_msg rec; // message received 
+        struct resp_msg rec; // message received
+	
         if((rcv = recv(sd, &rec, sizeof(struct resp_msg), 0)) < 0){ // ensure success with recv function
             perror("Error receiving message");
             close(sd);
             exit(EXIT_FAILURE);
-        }
+	    }
 
         printf("Client response received, type = %d, status = %d, filesize = %d\n", rec.msg_type, rec.status, rec.filesize);
+	printf("Client awaits server response\n");
+	send_data(sd, argv[4], msg.file_size);
+	printf("Client: %d bytes successfully sent\n", msg.file_size);
     }
     
     close(sd);
