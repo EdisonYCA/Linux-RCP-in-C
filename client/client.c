@@ -12,14 +12,14 @@ int main(int argc, char *argv[]){
     /* store address and port */
     int addr, port; // user defined address and port
     char *ttp; // user defined transfer type
-    FILE* file_name; // user defined file name
+    char *file_name; // user defined file name
 
     if(argc != 5){ // user has not passed address and port through cmd
         /* read address and port */
         char iaddr[30]; // address from input
         char iport[10]; // port from input
         char tt[5]; // transfer type from input
-        char file[30]; // file name from input
+        char ifile_name[30]; // file name from input
 
         printf("Enter address: ");
         scanf("%29s", iaddr);
@@ -31,12 +31,12 @@ int main(int argc, char *argv[]){
         scanf("%4s", tt);
 
         printf("Enter the name of the file: ");
-        scanf("%29s", argv[4]);
+        scanf("%29s", ifile_name);
 
         addr = inet_addr(iaddr);
         port = atoi(iport);
         ttp = tt;
-        //file_name = file;
+        file_name = ifile_name;
     }
 
     else { // user has passed address and port through cmd 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
         addr = inet_addr(argv[1]);
         port = atoi(argv[2]);
         ttp = argv[3];
-        //file_name = argv[4];
+        file_name = argv[4];
     }
 
     /* define sockaddr_in */
@@ -63,23 +63,23 @@ int main(int argc, char *argv[]){
     }
     
     printf("Client: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-    printf("Client file name: %s\n", argv[4]);
+    printf("Client file name: %s\n", file_name);
     
     /* send transfer type to transfer */
     if(strcmp(ttp, "-s") == 0){
-        file_name = fopen(argv[4], "r");
-        if(file_name == NULL) {
-	        perror("fopen");
+        int fd = open(file_name, O_RDONLY);
+        if(fd < 0) {
+	        perror("open");
 	        exit(EXIT_FAILURE);
         }
         
-        fseek(file_name, 0, SEEK_END);
+        lseek(fd, 0, SEEK_END);
         struct send_msg msg; // message to send
         msg.msg_type = CMD_SEND;
-        msg.file_size = 0;
-	    msg.file_size = ftell(file_name);
+        sprintf(msg.filename, "%s", file_name);
+	    msg.file_size = lseek(fd, 0, SEEK_END);
         
-        int snd; // return value from send(2)
+        int snd; // bytes sent
         if((snd = send(sd, &msg, sizeof(struct send_msg), 0)) < 0){ // send message and ensure success
             perror("Client could not send message: ");
             close(sd);
@@ -87,13 +87,20 @@ int main(int argc, char *argv[]){
         }
         
         printf("Client sends command to server: type %d, filesize %d, filename %s\n", msg.msg_type,
-        msg.file_size, argv[4]);
-        printf("send_msg sd = %d, leng = #\n", sd);
+        msg.file_size, file_name);
+        printf("send_msg sd = %d, leng = %d\n", sd, snd);
 
-        /*receiving message from client*/
+        /* receiving message from server */
         printf("receive_msg sd = %d\n", sd);
+        int rcv; // recv return value
+        struct resp_msg rec; // message received 
+        if((rcv = recv(sd, &rec, sizeof(struct resp_msg), 0)) < 0){ // ensure success with recv function
+            perror("Error receiving message");
+            close(sd);
+            exit(EXIT_FAILURE);
+        }
 
-        printf("Client response received, type =, status =, filesize =\n");
+        printf("Client response received, type = %d, status = %d, filesize = %d\n", rec.msg_type, rec.status, rec.filesize);
     }
     
     close(sd);
