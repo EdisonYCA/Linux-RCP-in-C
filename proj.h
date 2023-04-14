@@ -17,7 +17,7 @@ that can be shared between the client and the server.
 
 extern int errno;
 
-int receive_msg(int, void*, int);
+void receive_msg(int, void*, int);
 int send_mesg(int, int, int, int, int, char*);
 void send_data(int, char*, int);
 void recv_data(int, char*, int);
