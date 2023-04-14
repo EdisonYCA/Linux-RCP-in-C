@@ -13,8 +13,10 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    /* store address and port */
+    /* store address, port, filename, and fd */
     int addr, port; // user defined address and port
+    char *file_name; // output file name
+    int fd; // file descriptor
      
     if(argc != 3){ // user has not passed address and port through cmd
         /* read address and port */
@@ -79,24 +81,57 @@ int main(int argc, char *argv[]){
         }
         printf("Server: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
         printf("sd = %d, rem_sd = %d\n", sd, cli_sd); // socket descriptors
-        printf("receive_msg sd = %d", cli_sd);
+        printf("receive_msg sd = %d\n", cli_sd);
+
         /* receive the transfer type from client */
         int rcv; // recv return value
         struct send_msg rec_msg; // message received 
-        rec_msg.msg_type = CMD_RECV;
-        rec_msg.file_size = 0;
-	    //rec_msg.file_size = ftell();
         if((rcv = recv(cli_sd, &rec_msg, sizeof(struct send_msg), 0)) < 0){ // ensure success with recv function
             perror("Error receiving message");
             close(sd);
             exit(EXIT_FAILURE);
         }
+        
         printf("Server: Received message type %d from %s, port %d\n", rec_msg.msg_type, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
 
-        /* sending message to client*/
+        /* sending message to client */
+        // set output file
+        if(rec_msg.msg_type == CMD_SEND){
+            file_name = rec_msg.filename;
+            fd = open(file_name, O_WRONLY | O_CREAT, 0644);
+            if(fd < 0) {
+                perror("open");
+                close(sd);
+                close(cli_sd);
+                exit(EXIT_FAILURE);
+            } 
+
+            struct resp_msg msg; // message to send
+            msg.filesize = lseek(fd, 0, SEEK_END);
+            msg.status = STAT_OK;
+            msg.msg_type = CMD_RESP;
+
+            int snd; // bytes sent
+            if((snd = send(cli_sd, &msg, sizeof(struct resp_msg), 0)) < 0){ // send message and ensure success
+                perror("Server could not send message: ");
+                close(sd);
+                close(cli_sd);
+                exit(EXIT_FAILURE);
+            }
+
+            printf("Server: sends response: type %d, status %d, and file size %d\n", msg.msg_type, msg.status, msg.filesize);
+            printf("send_msg sd = %d, leng = %d\n", cli_sd, snd);
+            printf("Server: response sent\nServer awaits data\n");
+            
+        }
 
 
-        /*file writing*/
+
+
+
+
+
+        /* file writing */
 
 
     }
