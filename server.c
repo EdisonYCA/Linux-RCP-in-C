@@ -56,7 +56,6 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-               
     /* listening for a client */
     if ((listen(sd, 128)) < 0) { // marks socket as passive
         perror("Listening failed");
@@ -67,7 +66,7 @@ int main(int argc, char *argv[]){
     /* use accepts in a infinite loop to accept incoming connections */
     struct sockaddr_in client; // client to connect
     while(1) {
-        int len = sizeof(client); // len of client struct
+        socklen_t len = sizeof(client); // len of client struct
         int cli_sd; // client socket description
         if ((cli_sd = accept(sd, (SA*)&client, &len)) < 0) { // marks socket as passive
             perror("Accepting client failed: ");
@@ -82,19 +81,19 @@ int main(int argc, char *argv[]){
         receive_msg(cli_sd, &rec_msg, sizeof(struct send_msg));
         printf("Server: Received message type %d from %s, port %d\n", rec_msg.msg_type, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
 
-        /* sending message to client and receiving data from client */
-        if(rec_msg.msg_type == CMD_SEND){
-            /* open output file */
-            char *file_name = rec_msg.filename;
-            int fd = open(file_name, O_RDWR | O_CREAT, 0644);
-            if(fd < 0) {
-                perror("Server open");
-                close(sd);
-                close(cli_sd);
-                exit(EXIT_FAILURE);
-            } 
+        /* open output file */
+        char *file_name = rec_msg.filename;
+        int fd = open(file_name, O_RDWR | O_CREAT, 0644);
+        if(fd < 0) {
+            perror("Server open");
+            close(sd);
+            close(cli_sd);
+            exit(EXIT_FAILURE);
+        }
 
-            /* sending message */
+        /* sending message to client and receiving data from client */
+        if(rec_msg.msg_type == CMD_SEND){ 
+            /* sending response */
             int file_size = lseek(fd, 0, SEEK_END);
             int snd = send_mesg(CMD_RESP, CMD_RESP, cli_sd, file_size, STAT_OK, "None");
             printf("Server: sends response: type %d, status %d, and file size %d\n", CMD_RESP, STAT_OK, file_size);
@@ -105,9 +104,19 @@ int main(int argc, char *argv[]){
 	        recv_data(cli_sd, rec_msg.filename, rec_msg.file_size);
 	        printf("To server data transfer succeeded\n");
             close(cli_sd);
-        }
+        } else if(rec_msg.msg_type == CMD_RECV){
+            /* sending response */
+            int file_size = lseek(fd, 0, SEEK_END);
+            int snd = send_mesg(CMD_RESP, CMD_RESP, cli_sd, file_size, STAT_OK, "None");
+            printf("Server: sends response: type %d, status %d, and file size %d\n", CMD_RESP, STAT_OK, file_size);
+            printf("send_msg sd = %d, leng = %d\n", cli_sd, snd);
+            printf("Server: response sent\n");
 
-        /* file writing */
+            /* sending data */
+            send_data(cli_sd, file_name, file_size);
+            printf("Server: %d bytes successfully sent\n", file_size);
+        }
+        
         close(cli_sd);
     }
 

@@ -37,7 +37,7 @@ int send_mesg(int resp_msg, int msg_type, int sd, int size, int status, char *fi
 /* receives a single message from the network */
 void receive_msg(int sd, void *recv_str, int size) {
     int receive_sd;
-    if ((receive_sd = recv(sd, &recv_str, size, 0)) == -1) {     
+    if ((receive_sd = recv(sd, recv_str, size, 0)) == -1) {     
         perror("receive_msg recv");
         close(sd);
         exit(1);
