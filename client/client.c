@@ -69,44 +69,30 @@ int main(int argc, char *argv[]){
     
     /* send transfer type to transfer */
     if(strcmp(ttp, "-s") == 0){
+        /* open input file */
         int fd = open(file_name, O_RDONLY);
         if(fd < 0) {
 	        perror("open");
 	        exit(EXIT_FAILURE);
         }
-        
-        lseek(fd, 0, SEEK_END);
-        struct send_msg msg; // message to send
-        msg.msg_type = CMD_SEND;
-        sprintf(msg.filename, "%s", file_name);
-	msg.file_size = lseek(fd, 0, SEEK_END);
-        
-        int snd; // bytes sent
-        if((snd = send(sd, &msg, sizeof(struct send_msg), 0)) < 0){ // send message and ensure success
-            perror("Client could not send message: ");
-            close(sd);
-            exit(EXIT_FAILURE);
-        }
-        
-        printf("Client sends command to server: type %d, filesize %d, filename %s\n", msg.msg_type,
-        msg.file_size, file_name);
+
+        /* sending transfer type */
+        int filesize = lseek(fd, 0, SEEK_END);
+        int snd = send_mesg(CMD_SEND, CMD_SEND, sd, filesize, 0, file_name);
+        printf("Client sends command to server: type %d, filesize %d, filename %s\n", CMD_SEND,
+        filesize, file_name);
         printf("send_msg sd = %d, leng = %d\n", sd, snd);
 
-        /* receiving message from server */
+        /* receiving response from server */
         printf("receive_msg sd = %d\n", sd);
-        int rcv; // recv return value
         struct resp_msg rec; // message received
-	
-        if((rcv = recv(sd, &rec, sizeof(struct resp_msg), 0)) < 0){ // ensure success with recv function
-            perror("Error receiving message");
-            close(sd);
-            exit(EXIT_FAILURE);
-	    }
-
+        receive_msg(sd, &rec, sizeof(struct resp_msg));
         printf("Client response received, type = %d, status = %d, filesize = %d\n", rec.msg_type, rec.status, rec.filesize);
-	printf("Client awaits server response\n");
-	send_data(sd, argv[4], msg.file_size);
-	printf("Client: %d bytes successfully sent\n", msg.file_size);
+        printf("Client awaits server response\n");
+
+        /* sending data */
+        send_data(sd, file_name,filesize);
+        printf("Client: %d bytes successfully sent\n", filesize);
     }
     
     close(sd);
