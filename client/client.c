@@ -67,15 +67,15 @@ int main(int argc, char *argv[]){
     printf("Client: Connected to %s, port %d\n", inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
     printf("Client file name: %s\n", file_name);
     
+    /* open input file */
+    int fd = open(file_name, O_RDWR | O_CREAT, 0644);
+    if(fd < 0) {
+	    perror("open");
+	    exit(EXIT_FAILURE);
+    }
+    
     /* send transfer type to transfer */
     if(strcmp(ttp, "-s") == 0){
-        /* open input file */
-        int fd = open(file_name, O_RDONLY);
-        if(fd < 0) {
-	        perror("open");
-	        exit(EXIT_FAILURE);
-        }
-
         /* sending transfer type */
         int filesize = lseek(fd, 0, SEEK_END);
         int snd = send_mesg(CMD_SEND, CMD_SEND, sd, filesize, 0, file_name);
@@ -91,8 +91,39 @@ int main(int argc, char *argv[]){
         printf("Client awaits server response\n");
 
         /* sending data */
-        send_data(sd, file_name,filesize);
-        printf("Client: %d bytes successfully sent\n", filesize);
+        if(rec.status == STAT_OK){
+            send_data(sd, file_name,filesize);
+            printf("Client: %d bytes successfully sent\n", filesize);
+        } else if(rec.status == STAT_FAIL){
+            printf("Client: server sent status failure... ending program.\n");
+            close(sd);
+            exit(EXIT_FAILURE);
+        }
+    } else if(strcmp(ttp, "-r") == 0){
+        /* sending transfer type */
+        int filesize = lseek(fd, 0, SEEK_END);
+        int snd = send_mesg(CMD_RECV, CMD_RECV, sd, filesize, 0, file_name);
+        printf("Client sends command to server: type %d, filesize %d, filename %s\n", CMD_RECV,
+        filesize, file_name);
+        printf("send_msg sd = %d, leng = %d\n", sd, snd);
+
+        /* receiving response from server */
+        printf("receive_msg sd = %d\n", sd);
+        struct resp_msg rec; // message received
+        receive_msg(sd, &rec, sizeof(struct resp_msg));
+        printf("Client response received, type = %d, status = %d, filesize = %d\n", rec.msg_type, rec.status, rec.filesize);
+        printf("Client awaits data\n");
+
+        /* recieve data if status OK */
+        if(rec.status == STAT_OK){
+            recv_data(sd, file_name, rec.filesize);
+	        printf("To client data transfer succeeded\n");
+            close(sd);
+        } else if(rec.status == STAT_FAIL){
+            printf("Client: server sent status failure... ending program.\n");
+            close(sd);
+            exit(EXIT_FAILURE);
+        }
     }
     
     close(sd);
