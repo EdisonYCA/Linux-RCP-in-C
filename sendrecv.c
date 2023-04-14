@@ -67,7 +67,7 @@ void send_data(int sd, char *filename, int filesize) {
         data.data_leng = rd;
 
         if (init) {
-            printf("send_data: fd = %d, sd = %d, size = %d\n", fd, sd, size);
+            printf("send_data: fd = %d, sd = %d, size = %d\n", fd, sd, filesize);
             init--;
         }
 
