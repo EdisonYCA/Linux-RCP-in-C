@@ -3,11 +3,7 @@
 int main(int argc, char *argv[]){
     /* define TCP socket */
     int sd; // socket descriptor
-    // FILE *file;
-    // struct send_msg sendMessage;
-    
-    // int rem_sd, receive, send, size;
-    
+
     if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){ // ensure sucess
         perror("Error creating server socket");
         exit(EXIT_FAILURE);
@@ -122,10 +118,13 @@ int main(int argc, char *argv[]){
             printf("Server: sends response: type %d, status %d, and file size %d\n", msg.msg_type, msg.status, msg.filesize);
             printf("send_msg sd = %d, leng = %d\n", cli_sd, snd);
             printf("Server: response sent\nServer awaits data\n");
+	    recv_data(cli_sd, rec_msg.filename, rec_msg.file_size);
+	    printf("To server data transfer succeeded\n");
+            close(cli_sd);
             
         }
 
-
+	
 
 
 
