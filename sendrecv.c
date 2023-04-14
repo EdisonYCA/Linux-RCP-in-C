@@ -22,10 +22,10 @@ int send_mesg(int resp_msg, int msg_type, int sd, int size, int status, char *fi
     }
     else {
 
-        struct send_msg send;
-        send.msg_type = msg_type;
-        send.file_size = size;
-        strcpy(send.filename, filename);
+        struct send_msg ssend;
+        ssend.msg_type = msg_type;
+        ssend.file_size = size;
+        strcpy(ssend.filename, filename);
 
         if ((send_sd = send(sd, &send, sizeof(send), 0)) == -1) {
 
@@ -45,7 +45,7 @@ int receive_msg(int sd, void *recv_str, int size) {
 
     int receive_sd;
 
-    if ((rsd = recv(sd, recv_str, size, 0)) == -1) {
+    if ((receive_sd = recv(sd, recv_str, size, 0)) == -1) {
         
         perror("receive_msg recv");
         close(sd);
