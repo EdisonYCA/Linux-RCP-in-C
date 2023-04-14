@@ -15,13 +15,12 @@ that can be shared between the client and the server.
 #include <fcntl.h>
 #include <string.h>
 
-
 extern int errno;
 
-int receive_msg();
-int send_mesg();
-void send_data();
-void recv_data();
+void receive_msg(int, void*, int);
+int send_mesg(int, int, int, int, int, char*);
+void send_data(int, char*, int);
+void recv_data(int, char*, int);
 
 #define MAX_DATA_SIZE 1024
 #define STAT_OK 1
