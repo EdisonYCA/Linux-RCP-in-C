@@ -117,7 +117,7 @@ int main(int argc, char *argv[]){
         /* recieve data if status OK */
         if(rec.status == STAT_OK){
             recv_data(sd, file_name, rec.filesize);
-	        printf("To client data transfer succeeded\n");
+	    printf("To client data transfer succeeded\n");
             close(sd);
         } else if(rec.status == STAT_FAIL){
             printf("Client: server sent status failure... ending program.\n");
