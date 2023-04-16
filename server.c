@@ -101,8 +101,8 @@ int main(int argc, char *argv[]){
             printf("Server: response sent\nServer awaits data\n");
 
             /* receiving data */
-	        recv_data(cli_sd, rec_msg.filename, rec_msg.file_size);
-	        printf("To server data transfer succeeded\n");
+	    recv_data(cli_sd, rec_msg.filename, rec_msg.file_size);
+	    printf("To server data transfer succeeded\n");
             close(cli_sd);
         } else if(rec_msg.msg_type == CMD_RECV){
             /* sending response */
