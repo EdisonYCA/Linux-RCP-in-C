@@ -27,7 +27,7 @@ int send_mesg(int resp_msg, int msg_type, int sd, int size, int status, char *fi
         if ((send_sd = send(sd, &ssend, sizeof(ssend), 0)) == -1) {
             perror("send_msg send");
             close(sd);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -40,7 +40,7 @@ void receive_msg(int sd, void *recv_str, int size) {
     if ((receive_sd = recv(sd, recv_str, size, 0)) == -1) {     
         perror("receive_msg recv");
         close(sd);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 
